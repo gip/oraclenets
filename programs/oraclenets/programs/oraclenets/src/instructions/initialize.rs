@@ -1,8 +1,5 @@
 use super::*;
 
-use anchor_lang::system_program;
-use anchor_spl::token;
-
 use crate::state::oracle::Oracle;
 use crate::error::OracleError;
 
@@ -59,7 +56,8 @@ impl Initialize<'_> {
         oracle.count_slashed = 0;
         oracle.stage = crate::state::oracle::Stage::Commit;
         oracle.is_resolved = false;
-        oracle.resolution_bit = None;
+        oracle.is_tie = false;
+        oracle.resolution_bit = false;
         oracle.collateral_amount = args.collateral_amount;
         oracle.collateral_mint = ctx.accounts.collateral_mint.key();
         oracle.collateral_vault = ctx.accounts.collateral_vault.key();

@@ -155,8 +155,8 @@ describe("oraclenets", () => {
   it("Finalize", async () => {
     await program.methods.finalize()
                          .accounts({ oracle: oraclePda }).signers([payer]).rpc()
-    // const oracleAccount = await program.account.oracle.fetch(oraclePda);
-    // console.log("Oracle account", oracleAccount);
+    const oracleAccount = await program.account.oracle.fetch(oraclePda);
+    console.log("Oracle account", oracleAccount);
   })
 
   it("Claim", async () => {

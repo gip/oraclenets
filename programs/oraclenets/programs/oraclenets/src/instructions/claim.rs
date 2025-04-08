@@ -1,8 +1,5 @@
 use super::*;
 
-use anchor_lang::system_program;
-use anchor_spl::token;
-
 use crate::state::oracle::Oracle;
 use crate::state::commitment::Commitment;
 use crate::error::OracleError;
@@ -44,10 +41,10 @@ impl Claim<'_> {
         let commitment = &mut ctx.accounts.commitment;
         require!(oracle.stage == Stage::Claim, OracleError::WrongStage);
         require!(oracle.is_resolved, OracleError::OracleNotResolved);
-        require!(commitment.revealed, OracleError::CommitmentNotRevealed);
-        require!(!commitment.claimed, OracleError::AlreadyClaimed);
-        require!(!commitment.slashed, OracleError::CommitmentSlashed);
-        require!(oracle.resolution_bit.is_some() && oracle.resolution_bit.unwrap() == commitment.resolution, OracleError::InvalidResolution);
+        require!(commitment.is_revealed, OracleError::CommitmentNotRevealed);
+        require!(!commitment.is_claimed, OracleError::AlreadyClaimed);
+        require!(!commitment.is_slashed, OracleError::CommitmentSlashed);
+        require!(!oracle.is_tie && oracle.resolution_bit == commitment.resolution_bit, OracleError::InvalidResolution);
 
         let seeds: &[&[u8]] = &[
             b"oracle",
@@ -67,7 +64,7 @@ impl Claim<'_> {
         token::transfer(cpi_context, amount)?;
 
         // Mark the commitment as claimed.
-        commitment.claimed = true;
+        commitment.is_claimed = true;
         Ok(())
     }
 }

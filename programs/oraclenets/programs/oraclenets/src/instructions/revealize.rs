@@ -1,8 +1,5 @@
 use super::*;
 
-use anchor_lang::system_program;
-use anchor_spl::token;
-
 use crate::state::oracle::Oracle;
 use crate::error::OracleError;
 

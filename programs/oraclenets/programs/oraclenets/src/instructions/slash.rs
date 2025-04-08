@@ -1,8 +1,5 @@
 use super::*;
 
-use anchor_lang::system_program;
-use anchor_spl::token;
-
 use crate::state::oracle::Oracle;
 use crate::state::commitment::Commitment;
 use crate::error::OracleError;
@@ -41,8 +38,8 @@ impl Slash<'_> {
         let check = check_commitment(oracle.uuid, args.commit_nonce, commitment.commit_hash);
         match check {
             Some(_) => {
-                commitment.revealed = true;
-                commitment.slashed = true;
+                commitment.is_revealed = true;
+                commitment.is_slashed = true;
                 oracle.count_slashed += 1;
                 msg!("Slashed commitment");
             },
