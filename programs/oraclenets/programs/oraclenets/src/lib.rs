@@ -23,8 +23,8 @@ pub static USDC_MINT_PUBKEY: Pubkey = pubkey!("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSza
 pub mod oraclenets {
     use super::*;
 
-    pub fn initialize_oracle(ctx: Context<InitializeOracle>, args: InitializeOracleArgs) -> Result<()> {
-        InitializeOracle::handle(ctx, args)
+    pub fn initialize(ctx: Context<Initialize>, args: InitializeArgs) -> Result<()> {
+        Initialize::handle(ctx, args)
     }
 
     pub fn commit(ctx: Context<Commit>, args: CommitArgs) -> Result<()> {

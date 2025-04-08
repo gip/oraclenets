@@ -44,6 +44,7 @@ impl Slash<'_> {
                 commitment.revealed = true;
                 commitment.slashed = true;
                 oracle.count_slashed += 1;
+                msg!("Slashed commitment");
             },
             None => {
                 return Err(error!(OracleError::InvalidHash));

@@ -7,14 +7,14 @@ use crate::state::oracle::Oracle;
 use crate::error::OracleError;
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
-pub struct InitializeOracleArgs {
+pub struct InitializeArgs {
     pub question_uuid: [u8; 32],
     pub collateral_amount: u64,
 }
 
 #[derive(Accounts)]
-#[instruction(args: InitializeOracleArgs)]
-pub struct InitializeOracle<'info> {
+#[instruction(args: InitializeArgs)]
+pub struct Initialize<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -46,8 +46,8 @@ pub struct InitializeOracle<'info> {
     pub system_program: Program<'info, System>,
 }
 
-impl InitializeOracle<'_> {
-    pub fn handle(ctx: Context<Self>, args: InitializeOracleArgs) -> Result<()> {
+impl Initialize<'_> {
+    pub fn handle(ctx: Context<Self>, args: InitializeArgs) -> Result<()> {
         require_gte!(args.collateral_amount, 1_000_000, OracleError::InvalidCollateralAmount);
         let oracle = &mut ctx.accounts.oracle;
         oracle.owner = ctx.accounts.payer.key();

@@ -3,8 +3,8 @@ use super::*;
 pub mod common;
 pub use common::*;
 
-pub mod initialize_oracle;
-pub use initialize_oracle::*;
+pub mod initialize;
+pub use initialize::*;
 
 pub mod commit;
 pub use commit::*;
