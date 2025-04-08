@@ -1,8 +1,5 @@
 use super::*;
 
-use anchor_lang::system_program;
-use anchor_spl::token;
-
 use crate::state::oracle::Oracle;
 use crate::error::OracleError;
 
@@ -27,17 +24,19 @@ impl Finalize<'_> {
         let count_false = oracle.count_resolution_false;
         let count_true = oracle.count_resolution_true;
         
-        let mut count_winners = 0;
+        let count_winners;
         if count_false == count_true {
             count_winners = count_false + count_true;
+            oracle.is_tie = true;
         } else {
             let has_true_won = count_true > count_false;
-            oracle.resolution_bit = Some(has_true_won);
+            oracle.is_tie = false;
+            oracle.resolution_bit = has_true_won;
             count_winners = if has_true_won { count_true } else { count_false };
         }
 
-        let full_amount = oracle.count_joined * oracle.collateral_amount;
-        let amount_winners = if oracle.count_joined > 0 { full_amount / count_winners } else { 0 };
+        let full_amount = oracle.count_joined.checked_mul(oracle.collateral_amount).ok_or(OracleError::MathOverflow)?;
+        let amount_winners = if oracle.count_joined > 0 { full_amount / count_winners } else { 0 }; // Rounding down - some money may be lost
         oracle.amount_winners = amount_winners;
 
         oracle.is_resolved = true;

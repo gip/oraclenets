@@ -3,7 +3,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
-    token::{self, Burn, Mint, MintTo, Token, TokenAccount, Transfer},
+    token::{self, Mint, Token, TokenAccount, Transfer},
 };
 
 pub mod instructions;
@@ -12,8 +12,6 @@ pub mod error;
 
 use instructions::*;
 use state::oracle::*;
-use state::commitment::*;
-use error::OracleError;
 
 declare_id!("GB7w5vu4TfeXVDmcJpRTY1Rr9mHFcURVmN2AiAcHNNpW");
 

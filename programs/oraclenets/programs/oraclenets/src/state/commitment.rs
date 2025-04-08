@@ -4,8 +4,8 @@ use anchor_lang::prelude::*;
 pub struct Commitment {
     pub payer_token_account: Pubkey,
     pub commit_hash: [u8; 32],
-    pub revealed: bool,
-    pub resolution: bool, // Valid iff revealed is true
-    pub slashed: bool,
-    pub claimed: bool,
+    pub is_revealed: bool,
+    pub resolution_bit: bool, // Valid iff revealed is true
+    pub is_slashed: bool,
+    pub is_claimed: bool,
 }

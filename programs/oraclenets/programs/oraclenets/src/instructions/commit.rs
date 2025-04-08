@@ -1,8 +1,5 @@
 use super::*;
 
-use anchor_lang::system_program;
-use anchor_spl::token;
-
 use crate::state::oracle::Oracle;
 use crate::state::commitment::Commitment;
 use crate::error::OracleError;
@@ -60,9 +57,9 @@ impl Commit<'_> {
         let commitment = &mut ctx.accounts.commitment;
         commitment.payer_token_account = ctx.accounts.payer_token_account.key();
         commitment.commit_hash = args.commit_hash;
-        commitment.revealed = false;
-        commitment.slashed = false;
-        commitment.claimed = false;
+        commitment.is_revealed = false;
+        commitment.is_slashed = false;
+        commitment.is_claimed = false;
         Ok(())
     }
 }
