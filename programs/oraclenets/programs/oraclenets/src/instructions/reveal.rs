@@ -22,7 +22,7 @@ pub struct Reveal<'info> {
 
     #[account(
         mut,
-        seeds = [b"join", oracle.key().as_ref(), payer.key().as_ref()],
+        seeds = [b"commitment", oracle.key().as_ref(), payer.key().as_ref()],
         bump
     )]
     pub commitment: Account<'info, Commitment>,

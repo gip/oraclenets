@@ -1,24 +1,46 @@
 import * as anchor from "@coral-xyz/anchor"
 import { Program } from "@coral-xyz/anchor"
 import { Oraclenets } from "../target/types/oraclenets"
+import { createHash } from "crypto"
 import { 
-  TOKEN_PROGRAM_ID, 
   createMint, 
   getOrCreateAssociatedTokenAccount,
   mintTo,
   Account
 } from "@solana/spl-token"
+import { bs58 } from "@coral-xyz/anchor/dist/cjs/utils/bytes";
 
-describe("oraclenets", async () => {
-  // Configure the client to use the local cluster.
+const hash = (s: string): number[] => {
+  const raw = createHash('sha256').update(s).digest('hex')
+  return Array.from(Buffer.from(raw, 'hex'))
+}
+
+const assertTransactionFailed = async (action, expectedError: string) => {
+  try {
+    await action()
+  } catch (error) {
+    if (error.message.includes(expectedError)) {
+      // console.log("Transaction failed as expected with error: ", expectedError);
+    } else {
+      console.error("Unexpected error:", error)
+      throw error
+    }
+  }
+}
+
+
+describe("oraclenets", () => {
   anchor.setProvider(anchor.AnchorProvider.env())
-  const provider = anchor.getProvider() as anchor.AnchorProvider;
-  const connection = provider.connection;
+  const provider = anchor.getProvider() as anchor.AnchorProvider
+  const connection = provider.connection
 
   const program = anchor.workspace.Oraclenets as Program<Oraclenets>
 
-  const questionUuid = [7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7];
-  const payer = (provider.wallet as anchor.Wallet).payer;
+  const questionUuidRaw = createHash('sha256').update("Question1").digest('hex')
+  const questionUuid: Array<number> = Array.from(Buffer.from(questionUuidRaw, 'hex'))
+  const questionUuidBase58 = bs58.encode(questionUuid)
+
+  const payer = (provider.wallet as anchor.Wallet).payer
   
   let usdcMint: anchor.web3.PublicKey
   const [oraclePda, bump] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -28,90 +50,141 @@ describe("oraclenets", async () => {
       Buffer.from(questionUuid)
     ],
     program.programId
-  );
-
-  usdcMint = await createMint(
-    connection,
-    payer, // payer
-    payer.publicKey, // mint authority
-    null, // freeze authority (you can use null for this test)
-    6 // decimals (USDC has 6 decimals)
   )
 
-  const user100 = anchor.web3.Keypair.generate()
-  let user100TokenAccount: Account
-
-  it("Airdrop SOL to user100", async () => {
-    const signature = await connection.requestAirdrop(user100.publicKey, 2 * anchor.web3.LAMPORTS_PER_SOL);
-    await connection.confirmTransaction(signature);
-    console.log("Airdropped 2 SOL to user100");
-  });
-
-  it("airdrop USDC to user100", async () => {    
-    // Create a token account for user100
-    user100TokenAccount = await getOrCreateAssociatedTokenAccount(
+  it("Create mint", async () => {
+    usdcMint = await createMint(
       connection,
-      user100, // payer 
+      payer,
+      payer.publicKey,
+      null,
+        6
+      )
+  })
+
+  const createUser = async () => {
+    const user = anchor.web3.Keypair.generate()
+    const signature = await connection.requestAirdrop(user.publicKey, 2 * anchor.web3.LAMPORTS_PER_SOL)
+    await connection.confirmTransaction(signature)
+    const userTokenAccount = await getOrCreateAssociatedTokenAccount(
+      connection,
+      user, // payer 
       usdcMint, // mint
-      user100.publicKey // owner
-    );
-    console.log("Created USDC account for user100:", user100TokenAccount.address.toBase58());
-    
-    // Mint 1000 test USDC to user100's account
+      user.publicKey // owner
+    )
     await mintTo(
       connection,
-      payer, // payer
-      usdcMint, // mint
-      user100TokenAccount.address, // destination
-      payer.publicKey, // authority
-      1_000_000_000 // amount (1000 USDC with 6 decimals)
-    );
-    console.log("Minted 1000 test USDC to user100");
-  });
+      payer,
+      usdcMint,
+      userTokenAccount.address,
+      payer.publicKey,
+      1_000_000_000
+    )
+    return { user, userTokenAccount }
+  }
+
+  let user001, userTokenAccount001
+  let user002, userTokenAccount002
+  let user003, userTokenAccount003
+  let user004, userTokenAccount004
+  let user005, userTokenAccount005
+  it("Create users", async () => {
+    ({ user: user001, userTokenAccount: userTokenAccount001 } = await createUser());
+    ({ user: user002, userTokenAccount: userTokenAccount002 } = await createUser());
+    ({ user: user003, userTokenAccount: userTokenAccount003 } = await createUser());
+    ({ user: user004, userTokenAccount: userTokenAccount004 } = await createUser());
+    ({ user: user005, userTokenAccount: userTokenAccount005 } = await createUser());
+  })
 
   it("Initialized", async () => {
-    const tx = await program.methods.initializeOracle({ questionUuid, collateralAmount: new anchor.BN(1_000_000) })
-                                    .accounts({ collateralMint: usdcMint }).signers([payer]).rpc()  ;
-    console.log("Your transaction signature", tx);
+    await program.methods.initialize({ questionUuid, collateralAmount: new anchor.BN(1_000_001) })
+                         .accounts({ collateralMint: usdcMint }).signers([payer]).rpc()
   })
 
   it("Commit", async () => {
-    const tx = await program.methods.commit({ commitHash: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32] })
-                                    .accounts({ payer: user100.publicKey, payerTokenAccount: user100TokenAccount.address, oracle: oraclePda }).signers([user100]).rpc();
-    console.log("Your transaction signature", tx);
+    const c001 = hash(`${questionUuidBase58}-10-true`)
+    const c002 = hash(`${questionUuidBase58}-20-false`)
+    const c003 = hash(`${questionUuidBase58}-30-false`)
+    const c004 = hash(`${questionUuidBase58}-40-bad`)
+    const c005 = hash(`${questionUuidBase58}-50-true`)
+    await program.methods.commit({ commitHash: c001 })
+                         .accounts({ payer: user001.publicKey, payerTokenAccount: userTokenAccount001.address, oracle: oraclePda }).signers([user001]).rpc()
+    await program.methods.commit({ commitHash: c002 })
+                         .accounts({ payer: user002.publicKey, payerTokenAccount: userTokenAccount002.address, oracle: oraclePda }).signers([user002]).rpc()
+    await program.methods.commit({ commitHash: c003 })
+                         .accounts({ payer: user003.publicKey, payerTokenAccount: userTokenAccount003.address, oracle: oraclePda }).signers([user003]).rpc()
+    await program.methods.commit({ commitHash: c004 })
+                         .accounts({ payer: user004.publicKey, payerTokenAccount: userTokenAccount004.address, oracle: oraclePda }).signers([user004]).rpc()
+    await program.methods.commit({ commitHash: c005 })
+                         .accounts({ payer: user005.publicKey, payerTokenAccount: userTokenAccount005.address, oracle: oraclePda }).signers([user005]).rpc()
   })
 
   it("Reveal phase", async () => {
-    const tx = await program.methods.revealPhase()
-                                    .accounts({ oracle: oraclePda }).signers([payer]).rpc();
+    await program.methods.revealize()
+                         .accounts({ oracle: oraclePda }).signers([payer]).rpc()
 
   })
 
   it("Reveal", async () => {
-    const tx = await program.methods.reveal({ commitNonce: new anchor.BN(1) })
-                                    .accounts({ payer: user100.publicKey, oracle: oraclePda }).signers([user100]).rpc();
-    const oracleAccount = await program.account.oracle.fetch(oraclePda);
-    console.log("Oracle account", oracleAccount);
+    await program.methods.reveal({ commitNonce: new anchor.BN(10) })
+                         .accounts({ payer: user001.publicKey, oracle: oraclePda }).signers([user001]).rpc()
+    await program.methods.reveal({ commitNonce: new anchor.BN(20) })
+                         .accounts({ payer: user002.publicKey, oracle: oraclePda }).signers([user002]).rpc()
+    await program.methods.reveal({ commitNonce: new anchor.BN(30) })
+                         .accounts({ payer: user003.publicKey, oracle: oraclePda }).signers([user003]).rpc()
+    await program.methods.reveal({ commitNonce: new anchor.BN(40) })
+                         .accounts({ payer: user004.publicKey, oracle: oraclePda }).signers([user004]).rpc()
+
+    await program.methods.slash({ commitNonce: new anchor.BN(50) })
+                         .accounts({ payer: user001.publicKey, 
+                                     oracle: oraclePda,
+                                     target: user005.publicKey }).signers([user001]).rpc()
+
+    await assertTransactionFailed(
+      () => program.methods.slash({ commitNonce: new anchor.BN(9999999) })
+                           .accounts({ payer: user001.publicKey, 
+                                       oracle: oraclePda,
+                                       target: user004.publicKey }).signers([user001]).rpc(),
+      "Invalid hash"
+    )
+
+    // const oracleAccount = await program.account.oracle.fetch(oraclePda);
+    // console.log("Oracle account", oracleAccount);
   })
 
   it("Finalize", async () => {
-    const tx = await program.methods.finalize()
-                                    .accounts({ oracle: oraclePda }).signers([payer]).rpc();
-    console.log("Your transaction signature", tx);
+    await program.methods.finalize()
+                         .accounts({ oracle: oraclePda }).signers([payer]).rpc()
+    // const oracleAccount = await program.account.oracle.fetch(oraclePda);
+    // console.log("Oracle account", oracleAccount);
   })
 
   it("Claim", async () => {
-    try {
-      const tx = await program.methods.claim()
-                                      .accounts({ claimant: user100.publicKey, claimantTokenAccount: user100TokenAccount.address, oracle: oraclePda }).signers([user100]).rpc();
-      console.log("Your transaction signature", tx);
-    } catch (error) {
-      if (error.message.includes("Commitment slashed")) {
-        console.log("Transaction failed as expected with error: CommitmentSlashed");
-      } else {
-        console.error("Unexpected error:", error);
-        throw error;
-      }
-    }
+
+    await assertTransactionFailed(
+      () => program.methods.claim()
+                           .accounts({ claimant: user001.publicKey, claimantTokenAccount: userTokenAccount001.address, oracle: oraclePda }).signers([user001]).rpc(),
+      "Invalid resolution"
+    )
+
+    await program.methods.claim()
+                         .accounts({ claimant: user002.publicKey, claimantTokenAccount: userTokenAccount002.address, oracle: oraclePda }).signers([user002]).rpc()
+    await program.methods.claim()
+                         .accounts({ claimant: user003.publicKey, claimantTokenAccount: userTokenAccount003.address, oracle: oraclePda }).signers([user003]).rpc()
+
+    await assertTransactionFailed(
+      () => program.methods.claim()
+                           .accounts({ claimant: user004.publicKey, claimantTokenAccount: userTokenAccount004.address, oracle: oraclePda }).signers([user004]).rpc(),
+      "Commitment slashed"
+    )
+
+    await assertTransactionFailed(
+      () => program.methods.claim()
+                           .accounts({ claimant: user005.publicKey, claimantTokenAccount: userTokenAccount005.address, oracle: oraclePda }).signers([user005]).rpc(),
+      "Commitment slashed"
+    )
+
+    // const userTokenAccount001Balance = await connection.getTokenAccountBalance(userTokenAccount001.address);
+    // console.log("User token account 001 balance", userTokenAccount001Balance);
   })
 })

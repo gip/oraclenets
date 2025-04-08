@@ -24,7 +24,8 @@ pub struct Slash<'info> {
     pub target: AccountInfo<'info>,
 
     #[account(
-        seeds = [b"join", oracle.key().as_ref(), target.key().as_ref()],
+        mut,
+        seeds = [b"commitment", oracle.key().as_ref(), target.key().as_ref()],
         bump
     )]
     pub commitment: Account<'info, Commitment>,
@@ -43,6 +44,7 @@ impl Slash<'_> {
                 commitment.revealed = true;
                 commitment.slashed = true;
                 oracle.count_slashed += 1;
+                msg!("Slashed commitment");
             },
             None => {
                 return Err(error!(OracleError::InvalidHash));

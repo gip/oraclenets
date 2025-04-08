@@ -34,7 +34,7 @@ pub struct Commit<'info> {
         init,
         payer = payer,
         space = 8 + 32 + 32 * 8 + 1 + 1,
-        seeds = [b"join", oracle.key().as_ref(), payer.key().as_ref()],
+        seeds = [b"commitment", oracle.key().as_ref(), payer.key().as_ref()],
         bump
     )]
     pub commitment: Account<'info, Commitment>,
