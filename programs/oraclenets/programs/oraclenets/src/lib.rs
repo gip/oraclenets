@@ -31,8 +31,8 @@ pub mod oraclenets {
         Commit::handle(ctx, args)
     }
 
-    pub fn reveal_phase(ctx: Context<RevealPhase>) -> Result<()> {
-        RevealPhase::handle(ctx)
+    pub fn revealize(ctx: Context<Revealize>) -> Result<()> {
+        Revealize::handle(ctx)
     }
 
     pub fn reveal(ctx: Context<Reveal>, args: RevealArgs) -> Result<()> {

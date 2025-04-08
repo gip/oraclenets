@@ -12,8 +12,8 @@ pub use commit::*;
 pub mod reveal;
 pub use reveal::*;
 
-pub mod reveal_phase;
-pub use reveal_phase::*;
+pub mod revealize;
+pub use revealize::*;
 
 pub mod slash;
 pub use slash::*;

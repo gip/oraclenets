@@ -24,7 +24,8 @@ pub struct Slash<'info> {
     pub target: AccountInfo<'info>,
 
     #[account(
-        seeds = [b"join", oracle.key().as_ref(), target.key().as_ref()],
+        mut,
+        seeds = [b"commitment", oracle.key().as_ref(), target.key().as_ref()],
         bump
     )]
     pub commitment: Account<'info, Commitment>,

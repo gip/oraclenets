@@ -37,7 +37,7 @@ impl Finalize<'_> {
         }
 
         let full_amount = oracle.count_joined * oracle.collateral_amount;
-        let amount_winners = full_amount * count_winners / oracle.count_joined;
+        let amount_winners = if oracle.count_joined > 0 { full_amount / count_winners } else { 0 };
         oracle.amount_winners = amount_winners;
 
         oracle.is_resolved = true;

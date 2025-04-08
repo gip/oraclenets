@@ -7,7 +7,7 @@ use crate::state::oracle::Oracle;
 use crate::error::OracleError;
 
 #[derive(Accounts)]
-pub struct RevealPhase<'info> {
+pub struct Revealize<'info> {
     #[account(mut)]
     pub payer: Signer<'info>,
 
@@ -20,7 +20,7 @@ pub struct RevealPhase<'info> {
     pub system_program: Program<'info, System>,
 }
 
-impl RevealPhase<'_> {
+impl Revealize<'_> {
     pub fn handle(ctx: Context<Self>) -> Result<()> {
         require!(ctx.accounts.oracle.stage == Stage::Commit, OracleError::WrongStage);
         let oracle = &mut ctx.accounts.oracle;     
