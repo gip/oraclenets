@@ -13,9 +13,7 @@ pub mod error;
 use instructions::*;
 use state::oracle::*;
 
-declare_id!("GB7w5vu4TfeXVDmcJpRTY1Rr9mHFcURVmN2AiAcHNNpW");
-
-pub static USDC_MINT_PUBKEY: Pubkey = pubkey!("Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr");
+declare_id!("7LmvhrFDYvjKv5zH2X4dWiXFv9kr8A4Lej7Xo8EasyCk");
 
 #[program]
 pub mod oraclenets {

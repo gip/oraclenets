@@ -22,9 +22,9 @@ pub struct Initialize<'info> {
         seeds = [b"oracle", payer.key().as_ref(), args.question_uuid.as_ref()],
         bump
     )]
-    pub oracle: Box<Account<'info, Oracle>>,
+    pub oracle: Account<'info, Oracle>,
 
-    pub collateral_mint: Box<Account<'info, Mint>>,
+    pub collateral_mint: Account<'info, Mint>,
 
     #[account(
         init,
@@ -34,7 +34,7 @@ pub struct Initialize<'info> {
         seeds = [b"collateral_vault", oracle.key().as_ref()],
         bump
     )]
-    pub collateral_vault: Box<Account<'info, TokenAccount>>,
+    pub collateral_vault: Account<'info, TokenAccount>,
 
     pub token_program: Program<'info, anchor_spl::token::Token>,
 

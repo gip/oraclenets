@@ -5,13 +5,16 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-oraclenets = "GB7w5vu4TfeXVDmcJpRTY1Rr9mHFcURVmN2AiAcHNNpW"
+oraclenets = "7LmvhrFDYvjKv5zH2X4dWiXFv9kr8A4Lej7Xo8EasyCk"
+
+[programs.devnet]
+oraclenets = "7LmvhrFDYvjKv5zH2X4dWiXFv9kr8A4Lej7Xo8EasyCk"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
