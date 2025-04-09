@@ -1,0 +1,836 @@
+{
+  "address": "7LmvhrFDYvjKv5zH2X4dWiXFv9kr8A4Lej7Xo8EasyCk",
+  "metadata": {
+    "name": "oraclenets",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "claim",
+      "discriminator": [
+        62,
+        198,
+        214,
+        193,
+        213,
+        159,
+        108,
+        210
+      ],
+      "accounts": [
+        {
+          "name": "claimant",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "claimant_token_account",
+          "writable": true
+        },
+        {
+          "name": "oracle",
+          "writable": true
+        },
+        {
+          "name": "collateral_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  108,
+                  108,
+                  97,
+                  116,
+                  101,
+                  114,
+                  97,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "oracle"
+              }
+            ]
+          }
+        },
+        {
+          "name": "commitment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  109,
+                  105,
+                  116,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "oracle"
+              },
+              {
+                "kind": "account",
+                "path": "claimant"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "commit",
+      "discriminator": [
+        223,
+        140,
+        142,
+        165,
+        229,
+        208,
+        156,
+        74
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "payer_token_account",
+          "writable": true
+        },
+        {
+          "name": "oracle",
+          "writable": true
+        },
+        {
+          "name": "collateral_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  108,
+                  108,
+                  97,
+                  116,
+                  101,
+                  114,
+                  97,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "oracle"
+              }
+            ]
+          }
+        },
+        {
+          "name": "commitment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  109,
+                  105,
+                  116,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "oracle"
+              },
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "CommitArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "finalize",
+      "discriminator": [
+        171,
+        61,
+        218,
+        56,
+        127,
+        115,
+        12,
+        217
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "owner",
+          "relations": [
+            "oracle"
+          ]
+        },
+        {
+          "name": "oracle",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "oracle",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  111,
+                  114,
+                  97,
+                  99,
+                  108,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "payer"
+              },
+              {
+                "kind": "arg",
+                "path": "args.question_uuid"
+              }
+            ]
+          }
+        },
+        {
+          "name": "collateral_mint"
+        },
+        {
+          "name": "collateral_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  108,
+                  108,
+                  97,
+                  116,
+                  101,
+                  114,
+                  97,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "oracle"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "InitializeArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "reveal",
+      "discriminator": [
+        9,
+        35,
+        59,
+        190,
+        167,
+        249,
+        76,
+        115
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "oracle",
+          "writable": true
+        },
+        {
+          "name": "commitment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  109,
+                  105,
+                  116,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "oracle"
+              },
+              {
+                "kind": "account",
+                "path": "payer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "RevealArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "revealize",
+      "discriminator": [
+        188,
+        143,
+        99,
+        231,
+        248,
+        16,
+        136,
+        208
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "owner",
+          "relations": [
+            "oracle"
+          ]
+        },
+        {
+          "name": "oracle",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "slash",
+      "discriminator": [
+        204,
+        141,
+        18,
+        161,
+        8,
+        177,
+        92,
+        142
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "oracle",
+          "writable": true
+        },
+        {
+          "name": "target"
+        },
+        {
+          "name": "commitment",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  109,
+                  105,
+                  116,
+                  109,
+                  101,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "oracle"
+              },
+              {
+                "kind": "account",
+                "path": "target"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "SlashArgs"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Commitment",
+      "discriminator": [
+        61,
+        112,
+        129,
+        128,
+        24,
+        147,
+        77,
+        87
+      ]
+    },
+    {
+      "name": "Oracle",
+      "discriminator": [
+        139,
+        194,
+        131,
+        179,
+        140,
+        179,
+        229,
+        244
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidCollateralAmount",
+      "msg": "Invalid collateral amount."
+    },
+    {
+      "code": 6001,
+      "name": "MathOverflow",
+      "msg": "Math overflow."
+    },
+    {
+      "code": 6002,
+      "name": "WrongStage",
+      "msg": "Wrong stage."
+    },
+    {
+      "code": 6003,
+      "name": "CommitmentAlreadyRevealed",
+      "msg": "Commitment already revealed."
+    },
+    {
+      "code": 6004,
+      "name": "InvalidHash",
+      "msg": "Invalid hash."
+    },
+    {
+      "code": 6005,
+      "name": "AlreadyClaimed",
+      "msg": "Already claimed."
+    },
+    {
+      "code": 6006,
+      "name": "CommitmentSlashed",
+      "msg": "Commitment slashed."
+    },
+    {
+      "code": 6007,
+      "name": "CommitmentNotRevealed",
+      "msg": "Commitment not revealed."
+    },
+    {
+      "code": 6008,
+      "name": "InvalidResolution",
+      "msg": "Invalid resolution."
+    },
+    {
+      "code": 6009,
+      "name": "OracleNotResolved",
+      "msg": "Oracle not resolved."
+    },
+    {
+      "code": 6010,
+      "name": "QuestionTooLong",
+      "msg": "Question too long."
+    },
+    {
+      "code": 6011,
+      "name": "Unauthorized",
+      "msg": "Unauthorized."
+    },
+    {
+      "code": 6012,
+      "name": "InvalidUuid",
+      "msg": "Invalid UUID."
+    }
+  ],
+  "types": [
+    {
+      "name": "CommitArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "commit_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Commitment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "payer_token_account",
+            "type": "pubkey"
+          },
+          {
+            "name": "commit_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "is_revealed",
+            "type": "bool"
+          },
+          {
+            "name": "resolution_bit",
+            "type": "bool"
+          },
+          {
+            "name": "is_slashed",
+            "type": "bool"
+          },
+          {
+            "name": "is_claimed",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitializeArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "question_uuid",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "collateral_amount",
+            "type": "u64"
+          },
+          {
+            "name": "question",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Oracle",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "uuid",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "collateral_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "collateral_vault",
+            "type": "pubkey"
+          },
+          {
+            "name": "collateral_amount",
+            "type": "u64"
+          },
+          {
+            "name": "stage",
+            "type": {
+              "defined": {
+                "name": "Stage"
+              }
+            }
+          },
+          {
+            "name": "count_joined",
+            "type": "u64"
+          },
+          {
+            "name": "count_resolution_true",
+            "type": "u64"
+          },
+          {
+            "name": "count_resolution_false",
+            "type": "u64"
+          },
+          {
+            "name": "count_slashed",
+            "type": "u64"
+          },
+          {
+            "name": "is_resolved",
+            "type": "bool"
+          },
+          {
+            "name": "is_tie",
+            "type": "bool"
+          },
+          {
+            "name": "resolution_bit",
+            "type": "bool"
+          },
+          {
+            "name": "amount_winners",
+            "type": "u64"
+          },
+          {
+            "name": "question",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "RevealArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "commit_nonce",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SlashArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "commit_nonce",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Stage",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Commit"
+          },
+          {
+            "name": "Reveal"
+          },
+          {
+            "name": "Claim"
+          }
+        ]
+      }
+    }
+  ]
+}
