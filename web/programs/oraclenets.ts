@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/oraclenets.json`.
  */
 export type Oraclenets = {
-  "address": "7LmvhrFDYvjKv5zH2X4dWiXFv9kr8A4Lej7Xo8EasyCk",
+  "address": "7QJjHQAsytvvrNmqPJajKYKXwZXtVHd8T3t9bBVvxtMY",
   "metadata": {
     "name": "oraclenets",
     "version": "0.1.0",
@@ -106,6 +106,35 @@ export type Oraclenets = {
         {
           "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "close",
+      "discriminator": [
+        98,
+        165,
+        201,
+        177,
+        108,
+        65,
+        206,
+        96
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "oracle",
+          "writable": true
         },
         {
           "name": "systemProgram",

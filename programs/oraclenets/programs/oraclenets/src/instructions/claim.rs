@@ -44,7 +44,7 @@ impl Claim<'_> {
         require!(commitment.is_revealed, OracleError::CommitmentNotRevealed);
         require!(!commitment.is_claimed, OracleError::AlreadyClaimed);
         require!(!commitment.is_slashed, OracleError::CommitmentSlashed);
-        require!(!oracle.is_tie && oracle.resolution_bit == commitment.resolution_bit, OracleError::InvalidResolution);
+        require!(oracle.is_tie || oracle.resolution_bit == commitment.resolution_bit, OracleError::InvalidResolution);
 
         let seeds: &[&[u8]] = &[
             b"oracle",

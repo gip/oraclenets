@@ -23,3 +23,6 @@ pub use finalize::*;
 
 pub mod claim;
 pub use claim::*;
+
+pub mod close;
+pub use close::*;

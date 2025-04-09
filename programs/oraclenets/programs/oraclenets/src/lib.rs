@@ -13,7 +13,7 @@ pub mod error;
 use instructions::*;
 use state::oracle::*;
 
-declare_id!("7LmvhrFDYvjKv5zH2X4dWiXFv9kr8A4Lej7Xo8EasyCk");
+declare_id!("7QJjHQAsytvvrNmqPJajKYKXwZXtVHd8T3t9bBVvxtMY");
 
 #[program]
 pub mod oraclenets {
@@ -45,5 +45,9 @@ pub mod oraclenets {
 
     pub fn claim(ctx: Context<Claim>) -> Result<()> {
         Claim::handle(ctx)
+    }
+
+    pub fn close(ctx: Context<Close>) -> Result<()> {
+        Close::handle(ctx)
     }
 }

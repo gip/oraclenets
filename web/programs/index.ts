@@ -22,7 +22,7 @@ export function getOraclenetsProgramId(cluster: Cluster) {
     case 'testnet':
       // This is the program ID for the Counter program on devnet and testnet.
       // return new PublicKey('GB7w5vu4TfeXVDmcJpRTY1Rr9mHFcURVmN2AiAcHNNpW')
-      return new PublicKey('7LmvhrFDYvjKv5zH2X4dWiXFv9kr8A4Lej7Xo8EasyCk')
+      return new PublicKey('7QJjHQAsytvvrNmqPJajKYKXwZXtVHd8T3t9bBVvxtMY')
     case 'mainnet-beta':
     default:
       return COUNTER_PROGRAM_ID

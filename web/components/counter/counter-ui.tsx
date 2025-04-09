@@ -6,6 +6,7 @@ import { ellipsify } from '../ui/ui-layout'
 import { ExplorerLink } from '../cluster/cluster-ui'
 import { useCounterProgram, useCounterProgramAccount } from './counter-data-access'
 import { useWallet } from '@solana/wallet-adapter-react'
+import { bs58 } from '@coral-xyz/anchor/dist/cjs/utils/bytes'
 
 export function CounterCreate() {
   const { initialize, accounts, programId } = useCounterProgram()
@@ -53,8 +54,8 @@ export function CounterList({ owner }: { owner: PublicKey }) {
         </div>
       ) : (
         <div className="text-center">
-          <h2 className={'text-2xl'}>No accounts</h2>
-          No accounts found. Create one above to get started.
+          <h2 className={'text-2xl'}>Nothing there yet</h2>
+          No oracles found. Create one above to get started.
         </div>
       )}
     </div>
@@ -62,17 +63,22 @@ export function CounterList({ owner }: { owner: PublicKey }) {
 }
 
 function CounterCard({ account, owner }: { account: PublicKey, owner: PublicKey }) {
-  const { accountQuery, commitMutation, revealizeMutation, finalizeMutation, claimMutation } = useCounterProgramAccount({
+  const { accountQuery, commitMutation, revealMutation, slashMutation, revealizeMutation, finalizeMutation, claimMutation, closeMutation } = useCounterProgramAccount({
     account,
   })
 
   const stage = useMemo(() => Object.keys(accountQuery.data?.stage || {})[0]?.charAt(0).toUpperCase() + Object.keys(accountQuery.data?.stage || {})[0]?.slice(1), [accountQuery.data?.stage])
   const question = useMemo(() => accountQuery.data?.question.toString(), [accountQuery.data?.question])
+  const questionUuid = useMemo(() => accountQuery.data?.uuid, [accountQuery.data?.uuid])
+  const questionUuid58 = useMemo(() => questionUuid && bs58.encode(questionUuid), [questionUuid])
   const amOwner = useMemo(() => owner.toBase58() === accountQuery.data?.owner.toBase58(), [owner, accountQuery.data?.owner])
   const stake = useMemo(() => accountQuery.data?.collateralAmount.toString(), [accountQuery.data?.collateralAmount])
   const countJoined = useMemo(() => accountQuery.data?.countJoined ?? 0, [accountQuery.data?.countJoined])
+  const countSlashed = useMemo(() => accountQuery.data?.countSlashed ?? 0, [accountQuery.data?.countSlashed])
   const countResolutionTrue = useMemo(() => accountQuery.data?.countResolutionTrue ?? 0, [accountQuery.data?.countResolutionTrue])
   const countResolutionFalse = useMemo(() => accountQuery.data?.countResolutionFalse ?? 0, [accountQuery.data?.countResolutionFalse])
+  const isTie = useMemo(() => accountQuery.data?.isTie ?? 0, [accountQuery.data?.isTie])
+  const resolutionBit = useMemo(() => accountQuery.data?.resolutionBit ?? 0, [accountQuery.data?.resolutionBit])
 
   return accountQuery.isLoading ? (
     <span className="loading loading-spinner loading-lg"></span>
@@ -89,9 +95,12 @@ function CounterCard({ account, owner }: { account: PublicKey, owner: PublicKey 
       </div>
       <div className="card-title text-2xl flex justify-center p-2">{question || '<No question>'}</div>
       <p>Joined: {countJoined.toString()}</p>
-      <p>Owner: {amOwner ? 'Yes' : 'No'}</p>
-      <p>Stake: {stake}</p>
-      <p>True {countResolutionTrue.toString()} vs False {countResolutionFalse.toString()}</p>
+      <p>Slashed: {countSlashed.toString()}</p>
+      {questionUuid58 && localStorage.getItem(questionUuid58) && localStorage.getItem(questionUuid58) && <p>Nonce: stored locally</p>}
+      {!(questionUuid58 && localStorage.getItem(questionUuid58) && localStorage.getItem(questionUuid58)) && <p>Nonce: unknown</p>}
+      {stage === 'Claim' && <p>True {countResolutionTrue.toString()} vs False {countResolutionFalse.toString()}</p>}
+      {stage === 'Claim' && <p>Tie: {isTie ? 'Yes' : 'No'}</p>}
+      {stage === 'Claim' && !isTie&& <p>Resolution: {resolutionBit ? 'True' : 'False'}</p>}
       <div className="card-body items-center text-center">
         <div className="space-y-6">
           <div className="card-actions justify-around">
@@ -99,14 +108,18 @@ function CounterCard({ account, owner }: { account: PublicKey, owner: PublicKey 
               <>
                 <button
                   className="btn btn-xs lg:btn-md btn-outline text-xs"
-                  onClick={() => commitMutation.mutateAsync({ response: true, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })}
+                  onClick={() => {
+                    commitMutation.mutateAsync({ response: true, questionUuid58: questionUuid58!, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })
+                  }}
                   disabled={commitMutation.isPending}
                 >
                   Commit True
                 </button>
                 <button
                   className="btn btn-xs lg:btn-md btn-outline"
-                  onClick={() => commitMutation.mutateAsync({ response: false, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })}
+                  onClick={() => {
+                    commitMutation.mutateAsync({ response: false, questionUuid58: questionUuid58!, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })
+                  }}
                   disabled={commitMutation.isPending}
                 >
                   Commit False
@@ -127,10 +140,25 @@ function CounterCard({ account, owner }: { account: PublicKey, owner: PublicKey 
               <>
                 <button
                   className="btn btn-xs lg:btn-md btn-outline"
-                  onClick={() => revealizeMutation.mutateAsync({ response: false, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })}
+                  onClick={() => {
+                    revealMutation.mutateAsync({ response: false, questionUuid58: questionUuid58!, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })
+                  }}
                   disabled={revealizeMutation.isPending}
                 >
                   Reveal
+                </button>
+                <button
+                  className="btn btn-xs lg:btn-md btn-outline"
+                  onClick={() => {
+                    const target = window.prompt('Enter the target address')
+                    const nonce = window.prompt('Enter the nonce')
+                    if (target && nonce) {
+                      slashMutation.mutateAsync({ target: new PublicKey(target), nonce, questionUuid58: questionUuid58!, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })
+                    }
+                  }}
+                  disabled={revealizeMutation.isPending}
+                >
+                  Slash
                 </button>
                 {amOwner && (
                   <button
@@ -151,6 +179,15 @@ function CounterCard({ account, owner }: { account: PublicKey, owner: PublicKey 
                 disabled={claimMutation.isPending}
               >
                 Claim
+              </button>
+            )}
+            {stage === 'Claim' && amOwner && (
+              <button
+                className="btn btn-xs lg:btn-md btn-outline text-xs"
+                onClick={() => closeMutation.mutateAsync({ response: true, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })}
+                disabled={closeMutation.isPending}
+              >
+                Close
               </button>
             )}
           </div>
