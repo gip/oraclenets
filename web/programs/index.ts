@@ -1,8 +1,8 @@
 // Here we export some useful types and functions for interacting with the Anchor program.
 import { AnchorProvider, Program } from '@coral-xyz/anchor'
 import { Cluster, PublicKey } from '@solana/web3.js'
-import OraclenetsIDL from '../../programs/oraclenets/target/idl/oraclenets.json'
-import type { Oraclenets } from '../../programs/oraclenets/target/types/oraclenets'
+import OraclenetsIDL from './oraclenets.json'
+import type { Oraclenets } from './oraclenets'
 
 // Re-export the generated IDL and type
 export { Oraclenets, OraclenetsIDL }
