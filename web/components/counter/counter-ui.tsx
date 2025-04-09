@@ -14,12 +14,17 @@ export function CounterCreate() {
   return (
     <><button
       className="btn btn-xs lg:btn-md btn-primary"
-      onClick={() => initialize.mutateAsync(publicKey)}
+      onClick={() => {
+        const question = window.prompt('What is the question you would like the oracle to answer?')
+        if (question) {
+          initialize.mutateAsync(question.substring(0, 63))
+        }
+      }}
       disabled={initialize.isPending}
     >
       Create {initialize.isPending && '...'}
     </button>
-    <p>{JSON.stringify(programId)}</p></>
+    </>
   )
 }
 
@@ -57,68 +62,97 @@ export function CounterList({ owner }: { owner: PublicKey }) {
 }
 
 function CounterCard({ account, owner }: { account: PublicKey, owner: PublicKey }) {
-  const { accountQuery, incrementMutation, setMutation, decrementMutation, closeMutation } = useCounterProgramAccount({
+  const { accountQuery, commitMutation, revealizeMutation, finalizeMutation, claimMutation } = useCounterProgramAccount({
     account,
   })
 
-  const count = useMemo(() => accountQuery.data?.count ?? 0, [accountQuery.data?.count])
+  const stage = useMemo(() => Object.keys(accountQuery.data?.stage || {})[0]?.charAt(0).toUpperCase() + Object.keys(accountQuery.data?.stage || {})[0]?.slice(1), [accountQuery.data?.stage])
+  const question = useMemo(() => accountQuery.data?.question.toString(), [accountQuery.data?.question])
+  const amOwner = useMemo(() => owner.toBase58() === accountQuery.data?.owner.toBase58(), [owner, accountQuery.data?.owner])
+  const stake = useMemo(() => accountQuery.data?.collateralAmount.toString(), [accountQuery.data?.collateralAmount])
+  const countJoined = useMemo(() => accountQuery.data?.countJoined ?? 0, [accountQuery.data?.countJoined])
+  const countResolutionTrue = useMemo(() => accountQuery.data?.countResolutionTrue ?? 0, [accountQuery.data?.countResolutionTrue])
+  const countResolutionFalse = useMemo(() => accountQuery.data?.countResolutionFalse ?? 0, [accountQuery.data?.countResolutionFalse])
 
   return accountQuery.isLoading ? (
     <span className="loading loading-spinner loading-lg"></span>
   ) : (
-    <div className="card card-bordered border-base-300 border-4 text-neutral-content">
-      <p>Phase: {Object.keys(accountQuery.data?.stage || {})[0]}</p>
-      <p>Owner: {owner.toBase58() === accountQuery.data?.owner.toBase58() ? 'Yes' : 'No'}</p>
+    <div className="card card-bordered border-base-300 border-4 text-neutral-content p-2" style={{ width: '350px' }}>
+      <div className="flex justify-between">
+        <span>
+          <span className="bg-blue-100 text-blue-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">{stage}</span>
+          {amOwner && (
+            <span className="bg-green-100 text-green-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-green-900 dark:text-green-300">Owner</span>
+          )}
+        </span>
+        <ExplorerLink path={`account/${account}`} label={ellipsify(account.toString())} />
+      </div>
+      <div className="card-title text-2xl flex justify-center p-2">{question || '<No question>'}</div>
+      <p>Joined: {countJoined.toString()}</p>
+      <p>Owner: {amOwner ? 'Yes' : 'No'}</p>
+      <p>Stake: {stake}</p>
+      <p>True {countResolutionTrue.toString()} vs False {countResolutionFalse.toString()}</p>
       <div className="card-body items-center text-center">
         <div className="space-y-6">
-          <h2 className="card-title justify-center text-3xl cursor-pointer" onClick={() => accountQuery.refetch()}>
-            {count}
-          </h2>
           <div className="card-actions justify-around">
-            <button
-              className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => incrementMutation.mutateAsync()}
-              disabled={incrementMutation.isPending}
-            >
-              Increment
-            </button>
-            <button
-              className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => {
-                const value = window.prompt('Set value to:', count.toString() ?? '0')
-                if (!value || parseInt(value) === count || isNaN(parseInt(value))) {
-                  return
-                }
-                return setMutation.mutateAsync(parseInt(value))
-              }}
-              disabled={setMutation.isPending}
-            >
-              Set
-            </button>
-            <button
-              className="btn btn-xs lg:btn-md btn-outline"
-              onClick={() => decrementMutation.mutateAsync()}
-              disabled={decrementMutation.isPending}
-            >
-              Decrement
-            </button>
-          </div>
-          <div className="text-center space-y-4">
-            <p>
-              <ExplorerLink path={`account/${account}`} label={ellipsify(account.toString())} />
-            </p>
-            <button
-              className="btn btn-xs btn-secondary btn-outline"
-              onClick={() => {
-                if (!window.confirm('Are you sure you want to close this account?')) {
-                  return
-                }
-                return closeMutation.mutateAsync()
-              }}
-              disabled={closeMutation.isPending}
-            >
-              Close
-            </button>
+            {stage === 'Commit' && (
+              <>
+                <button
+                  className="btn btn-xs lg:btn-md btn-outline text-xs"
+                  onClick={() => commitMutation.mutateAsync({ response: true, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })}
+                  disabled={commitMutation.isPending}
+                >
+                  Commit True
+                </button>
+                <button
+                  className="btn btn-xs lg:btn-md btn-outline"
+                  onClick={() => commitMutation.mutateAsync({ response: false, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })}
+                  disabled={commitMutation.isPending}
+                >
+                  Commit False
+                </button>
+                {amOwner && (
+                  <button
+                    className="btn btn-xs lg:btn-md btn-outline"
+                    onClick={() => revealizeMutation.mutateAsync({ response: false, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })}
+                    disabled={revealizeMutation.isPending}
+                  >
+                    Revealize
+                  </button>
+                )}
+              </>
+            )}
+            
+            {stage === 'Reveal' && (
+              <>
+                <button
+                  className="btn btn-xs lg:btn-md btn-outline"
+                  onClick={() => revealizeMutation.mutateAsync({ response: false, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })}
+                  disabled={revealizeMutation.isPending}
+                >
+                  Reveal
+                </button>
+                {amOwner && (
+                  <button
+                    className="btn btn-xs lg:btn-md btn-outline"
+                    onClick={() => finalizeMutation.mutateAsync({ response: false, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })}
+                    disabled={finalizeMutation.isPending}
+                  >
+                    Finalize
+                  </button>
+                )}
+              </>
+            )}
+            
+            {stage === 'Claim' && (
+              <button
+                className="btn btn-xs lg:btn-md btn-outline text-xs"
+                onClick={() => claimMutation.mutateAsync({ response: true, questionUuid: accountQuery.data?.uuid!, payer: accountQuery.data?.owner! })}
+                disabled={claimMutation.isPending}
+              >
+                Claim
+              </button>
+            )}
           </div>
         </div>
       </div>

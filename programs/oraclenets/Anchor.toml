@@ -14,7 +14,7 @@ oraclenets = "7LmvhrFDYvjKv5zH2X4dWiXFv9kr8A4Lej7Xo8EasyCk"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

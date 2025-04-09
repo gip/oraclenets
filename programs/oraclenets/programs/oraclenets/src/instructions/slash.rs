@@ -15,7 +15,7 @@ pub struct Slash<'info> {
     pub payer: Signer<'info>,
 
     #[account(mut)]
-    pub oracle: Box<Account<'info, Oracle>>,
+    pub oracle: Account<'info, Oracle>,
 
     /// CHECK: By design, this is a raw account info
     pub target: AccountInfo<'info>,

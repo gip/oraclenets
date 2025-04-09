@@ -36,7 +36,9 @@ describe("oraclenets", () => {
 
   const program = anchor.workspace.Oraclenets as Program<Oraclenets>
 
-  const questionUuidRaw = createHash('sha256').update("Question1").digest('hex')
+  const question = "Question1"
+  const questionArray = Buffer.from(question)
+  const questionUuidRaw = createHash('sha256').update(question).digest('hex')
   const questionUuid: Array<number> = Array.from(Buffer.from(questionUuidRaw, 'hex'))
   const questionUuidBase58 = bs58.encode(questionUuid)
 
@@ -97,7 +99,7 @@ describe("oraclenets", () => {
   })
 
   it("Initialized", async () => {
-    await program.methods.initialize({ questionUuid, collateralAmount: new anchor.BN(1_000_001) })
+    await program.methods.initialize({ question: questionArray, questionUuid, collateralAmount: new anchor.BN(1_000_001) })
                          .accounts({ collateralMint: usdcMint }).signers([payer]).rpc()
   })
 

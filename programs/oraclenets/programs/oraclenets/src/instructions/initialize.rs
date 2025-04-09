@@ -7,6 +7,7 @@ use crate::error::OracleError;
 pub struct InitializeArgs {
     pub question_uuid: [u8; 32],
     pub collateral_amount: u64,
+    pub question: Vec<u8>,
 }
 
 #[derive(Accounts)]
@@ -45,7 +46,10 @@ pub struct Initialize<'info> {
 
 impl Initialize<'_> {
     pub fn handle(ctx: Context<Self>, args: InitializeArgs) -> Result<()> {
-        require_gte!(args.collateral_amount, 1_000_000, OracleError::InvalidCollateralAmount);
+        require_gte!(args.collateral_amount, 10_000, OracleError::InvalidCollateralAmount);
+        require!(args.question.len() < 64, OracleError::QuestionTooLong);
+        let question_hash = sha256_hash(&args.question);
+        require!(question_hash == args.question_uuid, OracleError::InvalidUuid);
         let oracle = &mut ctx.accounts.oracle;
         oracle.owner = ctx.accounts.payer.key();
         oracle.uuid = args.question_uuid;
@@ -62,6 +66,7 @@ impl Initialize<'_> {
         oracle.collateral_mint = ctx.accounts.collateral_mint.key();
         oracle.collateral_vault = ctx.accounts.collateral_vault.key();
         oracle.bump = ctx.bumps.oracle;
+        oracle.question = args.question;
         Ok(())
     }
 }

@@ -1,6 +1,12 @@
 use sha2::{Sha256, Digest};
 use bs58::encode;
 
+pub fn sha256_hash(data: &[u8]) -> [u8; 32] {
+    let mut hasher = Sha256::new();
+    hasher.update(data);
+    hasher.finalize().into()
+}
+
 pub fn check_commitment(uuid: [u8; 32], nonce: u64, commitment_hash: [u8; 32]) -> Option<bool> {
     let uuid_str = encode(uuid).into_string();
     let hash_if_true = format!("{}-{}-{}", uuid_str, nonce, "true");

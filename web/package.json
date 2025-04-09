@@ -22,13 +22,14 @@
     "@tabler/icons-react": "^3.11.0",
     "@tanstack/react-query": "^5.71.5",
     "@tanstack/react-query-next-experimental": "^5.51.11",
+    "bs58": "^5.0.0",
     "daisyui": "^4.12.10",
     "jotai": "^2.9.1",
     "next": "15.2.4",
     "react": "^19",
     "react-dom": "^19",
     "react-hot-toast": "^2.4.1",
-    "bs58": "5.0.0"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/bn.js": "^5.1.0",
@@ -48,11 +49,16 @@
     "rename": {
       "counter": {
         "to": "{{name}}",
-        "paths": ["anchor", "src"]
+        "paths": [
+          "anchor",
+          "src"
+        ]
       },
       "scaffold": {
         "to": "{{name}}",
-        "paths": ["src"]
+        "paths": [
+          "src"
+        ]
       }
     },
     "instructions": [
