@@ -5,10 +5,10 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-oraclenets = "7LmvhrFDYvjKv5zH2X4dWiXFv9kr8A4Lej7Xo8EasyCk"
+oraclenets = "7QJjHQAsytvvrNmqPJajKYKXwZXtVHd8T3t9bBVvxtMY"
 
 [programs.devnet]
-oraclenets = "7LmvhrFDYvjKv5zH2X4dWiXFv9kr8A4Lej7Xo8EasyCk"
+oraclenets = "7QJjHQAsytvvrNmqPJajKYKXwZXtVHd8T3t9bBVvxtMY"
 
 [registry]
 url = "https://api.apr.dev"

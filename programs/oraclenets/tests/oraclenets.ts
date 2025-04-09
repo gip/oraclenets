@@ -122,6 +122,23 @@ describe("oraclenets", () => {
   })
 
   it("Reveal phase", async () => {
+
+    await assertTransactionFailed(
+      async () => {
+        const [oraclePda001, bump] = anchor.web3.PublicKey.findProgramAddressSync(
+          [
+            Buffer.from("oracle"), 
+            user001.publicKey.toBuffer(), 
+            Buffer.from(questionUuid)
+          ],
+          program.programId
+        )
+        await program.methods.revealize()
+                            .accounts({ oracle: oraclePda001 }).signers([user001]).rpc()
+      },
+      "Unresolved account" // TODO: understand that better
+    )
+
     await program.methods.revealize()
                          .accounts({ oracle: oraclePda }).signers([payer]).rpc()
 
@@ -157,8 +174,8 @@ describe("oraclenets", () => {
   it("Finalize", async () => {
     await program.methods.finalize()
                          .accounts({ oracle: oraclePda }).signers([payer]).rpc()
-    const oracleAccount = await program.account.oracle.fetch(oraclePda);
-    console.log("Oracle account", oracleAccount);
+    // const oracleAccount = await program.account.oracle.fetch(oraclePda);
+    // console.log("Oracle account", oracleAccount);
   })
 
   it("Claim", async () => {

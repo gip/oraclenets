@@ -14,13 +14,13 @@ export default function CounterFeature() {
   return publicKey ? (
     <div>
       <AppHero
-        title="Counter"
+        title="Oracle Network"
         subtitle={
-          'Create a new account by clicking the "Create" button. The state of a account is stored on-chain and can be manipulated by calling the program\'s methods (increment, decrement, set, and close).'
+          'Create a new oracle by clicking the "Create" button. The state is stored on-chain and can be manipulated by calling the program\'s methods.'
         }
       >
         <p className="mb-6">
-          <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} />
+          Program ID: <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} />
         </p>
         <CounterCreate />
       </AppHero>
