@@ -12,13 +12,14 @@ pub struct Finalize<'info> {
     pub owner: AccountInfo<'info>,
 
     #[account(mut, has_one = owner)]
-    pub oracle: Box<Account<'info, Oracle>>,
+    pub oracle: Account<'info, Oracle>,
 
     pub system_program: Program<'info, System>,
 }
 
 impl Finalize<'_> {
     pub fn handle(ctx: Context<Self>) -> Result<()> {
+        require!(ctx.accounts.oracle.owner == ctx.accounts.owner.key(), OracleError::Unauthorized);
         require!(ctx.accounts.oracle.stage == Stage::Reveal, OracleError::WrongStage);
         let oracle = &mut ctx.accounts.oracle;
         let count_false = oracle.count_resolution_false;
@@ -36,7 +37,7 @@ impl Finalize<'_> {
         }
 
         let full_amount = oracle.count_joined.checked_mul(oracle.collateral_amount).ok_or(OracleError::MathOverflow)?;
-        let amount_winners = if oracle.count_joined > 0 { full_amount / count_winners } else { 0 }; // Rounding down - some money may be lost
+        let amount_winners = if count_winners > 0 { full_amount / count_winners } else { 0 }; // Rounding down - some money may be lost
         oracle.amount_winners = amount_winners;
 
         oracle.is_resolved = true;

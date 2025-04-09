@@ -18,7 +18,7 @@ pub struct Commit<'info> {
     pub payer_token_account: Account<'info, TokenAccount>,
 
     #[account(mut)]
-    pub oracle: Box<Account<'info, Oracle>>,
+    pub oracle: Account<'info, Oracle>,
 
     #[account(
         mut,

@@ -31,4 +31,13 @@ pub enum OracleError {
 
     #[msg("Oracle not resolved.")]
     OracleNotResolved,
+
+    #[msg("Question too long.")]
+    QuestionTooLong,
+
+    #[msg("Unauthorized.")]
+    Unauthorized,
+
+    #[msg("Invalid UUID.")]
+    InvalidUuid,
 }

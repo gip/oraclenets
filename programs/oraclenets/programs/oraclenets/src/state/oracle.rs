@@ -11,7 +11,7 @@ pub enum Stage {
 pub struct Oracle {
     // Metadata
     pub owner: Pubkey,
-    pub uuid: [u8; 32], // Question UUID
+    pub uuid: [u8; 32],
     pub bump: u8,
 
     // Vault
@@ -33,8 +33,11 @@ pub struct Oracle {
 
     // Amount of money that can be claimed by the winners
     pub amount_winners: u64,
+
+    // Question data
+    pub question: Vec<u8>, // Question - max 64 bytes
 }
 
 impl Oracle {
-    pub const INIT_SPACE: usize = 32 * 8 + 8 + (8 * 5) + 1 + 1 + 2 + 64;
+    pub const INIT_SPACE: usize = 32 + 32 + 1 + 32 + 32 + 8 + (8 * 5) + 1 + 1 + 1 + 8 + 64;
 }

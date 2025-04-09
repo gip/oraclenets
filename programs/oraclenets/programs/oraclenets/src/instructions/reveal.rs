@@ -15,7 +15,7 @@ pub struct Reveal<'info> {
     pub payer: Signer<'info>,
 
     #[account(mut)]
-    pub oracle: Box<Account<'info, Oracle>>,
+    pub oracle: Account<'info, Oracle>,
 
     #[account(
         mut,
