@@ -98,7 +98,7 @@ function CounterCard({ account, owner }: { account: PublicKey, owner: PublicKey 
       <p>Slashed: {countSlashed.toString()}</p>
       {questionUuid58 && localStorage.getItem(questionUuid58) && localStorage.getItem(questionUuid58) && <p>Nonce: stored locally</p>}
       {!(questionUuid58 && localStorage.getItem(questionUuid58) && localStorage.getItem(questionUuid58)) && <p>Nonce: unknown</p>}
-      {stage === 'Claim' && <p>True {countResolutionTrue.toString()} vs False {countResolutionFalse.toString()}</p>}
+      {(stage === 'Claim' || stage === 'Reveal') && <p>True {countResolutionTrue.toString()} vs False {countResolutionFalse.toString()}</p>}
       {stage === 'Claim' && <p>Tie: {isTie ? 'Yes' : 'No'}</p>}
       {stage === 'Claim' && !isTie&& <p>Resolution: {resolutionBit ? 'True' : 'False'}</p>}
       <div className="card-body items-center text-center">
