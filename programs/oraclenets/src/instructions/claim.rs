@@ -24,6 +24,7 @@ pub struct Claim<'info> {
 
     #[account(
         mut,
+        close = claimant,
         seeds = [b"commitment", oracle.key().as_ref(), claimant.key().as_ref()],
         bump
     )]
