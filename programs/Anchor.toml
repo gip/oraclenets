@@ -4,6 +4,11 @@
 resolution = true
 skip-lint = false
 
+[workspace]
+members = [
+  "oraclenets"
+]
+
 [programs.localnet]
 oraclenets = "7QJjHQAsytvvrNmqPJajKYKXwZXtVHd8T3t9bBVvxtMY"
 
@@ -14,7 +19,7 @@ oraclenets = "7QJjHQAsytvvrNmqPJajKYKXwZXtVHd8T3t9bBVvxtMY"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
